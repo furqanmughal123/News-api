@@ -1,0 +1,40 @@
+@baseUrl = http://127.0.0.1:8000
+
+### Health Check (Root)
+GET {{baseUrl}}/
+
+### Fetch All News
+# Scrapes data from all configured sources and returns a JSON list.
+GET {{baseUrl}}/news
+
+### List All Sources
+# Returns a list of available news sources and their IDs.
+GET {{baseUrl}}/sources
+
+### Fetch News by Source (Geo TV)
+GET {{baseUrl}}/news/geo_tv
+
+### Fetch News by Source (BBC News)
+GET {{baseUrl}}/news/bbc_news
+
+### Fetch News by Source (CNN)
+GET {{baseUrl}}/news/cnn
+
+### Fetch News by Source (Pakistan Point)
+GET {{baseUrl}}/news/pakistan_point
+
+### Fetch News by Source (TRT World)
+GET {{baseUrl}}/news/trt_world
+
+### Fetch News by Source (Middle East Eye)
+GET {{baseUrl}}/news/middle_east_eye
+
+### Web Dashboard
+# Returns the HTML user interface
+GET {{baseUrl}}/ui
+
+### Docs (Swagger UI)
+GET {{baseUrl}}/docs
+
+### OpenAPI JSON Schema
+GET {{baseUrl}}/openapi.json

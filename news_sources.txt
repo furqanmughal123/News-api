@@ -1,0 +1,20 @@
+# External News Sources
+# These are the URLs being scraped by your API to gather news.
+
+# 1. Geo TV
+https://www.geo.tv/
+
+# 2. BBC News
+http://feeds.bbci.co.uk/news/rss.xml
+
+# 3. CNN
+http://rss.cnn.com/rss/edition.rss
+
+# 4. Pakistan Point
+https://www.pakistanpoint.com/en/
+
+# 5. TRT World
+https://www.trtworld.com/news
+
+# 6. Middle East Eye (RSS)
+https://middleeasteye.net/rss

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Scraper API Tester</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --text-secondary: #6b7280;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        input,
+        select {
+            padding: 10px 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            width: 250px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background-color: #1d4ed8;
+        }
+
+        button:disabled {
+            background-color: #93c5fd;
+            cursor: not-allowed;
+        }
+
+        #status {
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-image {
+            height: 200px;
+            background-color: #e5e7eb;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s;
+        }
+
+        .card-image.no-image::before {
+            content: 'No Image';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #9ca3af;
+            font-weight: 600;
+        }
+
+        .card-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .source-tag {
+            background-color: #dbeafe;
+            color: #1e40af;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            align-self: flex-start;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+            line-height: 1.4;
+        }
+
+        .card-title a {
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        .card-title a:hover {
+            color: var(--primary-color);
+        }
+
+        .card-summary {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            flex-grow: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-footer {
+            margin-top: auto;
+            border-top: 1px solid #f3f4f6;
+            padding-top: 15px;
+            font-size: 0.75rem;
+            color: #9ca3af;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .loading {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .error {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 20px;
+            background: #fee2e2;
+            color: #b91c1c;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Global News Aggregator</h1>
+            <p>Testing API Endpoints</p>
+        </header>
+
+        <section class="controls">
+            <input type="text" id="apiUrl" value="" placeholder="API URL (e.g. http://127.0.0.1:8000)">
+            <select id="sourceSelect">
+                <option value="">All Sources</option>
+            </select>
+            <button onclick="testApi()" id="fetchBtn">Fetch News</button>
+            <div id="status"></div>
+        </section>
+
+        <main id="newsGrid" class="grid">
+            <!-- News items will be populated here -->
+        </main>
+    </div>
+
+    <script>
+        async function fetchSources(baseUrl) {
+            const select = document.getElementById('sourceSelect');
+            try {
+                const res = await fetch(`${baseUrl}/sources`);
+                if (res.ok) {
+                    const sources = await res.json();
+                    select.innerHTML = '<option value="">All Sources</option>';
+                    sources.forEach(source => {
+                        const option = document.createElement('option');
+                        option.value = source.id;
+                        option.textContent = source.name;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (e) {
+                console.warn('Could not fetch sources:', e);
+            }
+        }
+
+        async function testApi() {
+            let inputUrl = document.getElementById('apiUrl').value.trim();
+
+            // Smart default: If empty, and we are on the same port as API (likely not if using Live Server), use origin.
+            // Otherwise default to standard FastAPI port 8000
+            if (!inputUrl) {
+                if (window.location.port === '8000') {
+                    inputUrl = window.location.origin;
+                } else {
+                    inputUrl = 'http://127.0.0.1:8000';
+                }
+            }
+
+            // Sanitize: User might paste full path "http://localhost:8000/news/geo_tv"
+            // We only want the origin "http://localhost:8000"
+            try {
+                const urlObj = new URL(inputUrl);
+                // We keep only protocol + host (host includes port)
+                inputUrl = `${urlObj.protocol}//${urlObj.host}`;
+            } catch (e) {
+                // If invalid URL, leave as is, fetch will fail gracefully
+            }
+
+            const baseUrl = inputUrl.replace(/\/$/, '');
+
+            // Update the input to show the cleaned URL (optional, but good UX)
+            // document.getElementById('apiUrl').value = baseUrl;
+
+            // Fetch sources if empty (first run)
+            if (document.getElementById('sourceSelect').options.length <= 1) {
+                await fetchSources(baseUrl);
+            }
+
+            const grid = document.getElementById('newsGrid');
+            const status = document.getElementById('status');
+            const btn = document.getElementById('fetchBtn');
+            const sourceId = document.getElementById('sourceSelect').value;
+
+            // Reset
+            grid.innerHTML = '<div class="loading">Loading news articles... this may take a few seconds...</div>';
+            status.textContent = 'Connecting...';
+            status.style.color = 'blue';
+            btn.disabled = true;
+
+            try {
+                // 1. Fetch News (either all or specific source)
+                let endpoint = `${baseUrl}/news`;
+                if (sourceId) {
+                    endpoint = `${baseUrl}/news/${sourceId}`;
+                }
+
+                console.log(`Fetching from: ${endpoint}`);
+                const newsRes = await fetch(endpoint);
+                if (!newsRes.ok) throw new Error('Failed to fetch news data');
+                const articles = await newsRes.json();
+
+                status.textContent = `Success! Fetched ${articles.length} articles from ${sourceId || 'all sources'}.`;
+                status.style.color = 'green';
+
+                renderNews(articles);
+
+            } catch (error) {
+                console.error(error);
+                status.textContent = `Error: ${error.message}`;
+                status.style.color = 'red';
+                grid.innerHTML = `<div class="error">
+                    <h3>Connection Failed</h3>
+                    <p>Could not connect to ${baseUrl}. Make sure the FastAPI server is running.</p>
+                    <pre>${error.message}</pre>
+                </div>`;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function renderNews(articles) {
+            const grid = document.getElementById('newsGrid');
+            grid.innerHTML = '';
+
+            if (articles.length === 0) {
+                grid.innerHTML = '<div class="loading">No articles found.</div>';
+                return;
+            }
+
+            articles.forEach(article => {
+                const card = document.createElement('div');
+                card.className = 'card';
+
+                const timeStr = article.published_at ? new Date(article.published_at).toLocaleString() : 'Just now';
+
+                // Image handling
+                const imgHtml = article.image
+                    ? `<div class="card-image"><img src="${article.image}" alt="${article.title}" onerror="this.onerror=null;this.parentElement.classList.add('no-image');this.remove()"></div>`
+                    : `<div class="card-image no-image"></div>`;
+
+                card.innerHTML = `
+                    ${imgHtml}
+                    <div class="card-content">
+                        <span class="source-tag">${article.source}</span>
+                        <h2 class="card-title">
+                            <a href="${article.url}" target="_blank" rel="noopener noreferrer">${article.title}</a>
+                        </h2>
+                        <p class="card-summary">${article.summary || 'No summary available.'}</p>
+                        <div class="card-footer">
+                            <span>${timeStr}</span>
+                            <span>Read More &rarr;</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Auto load on start
+        window.addEventListener('DOMContentLoaded', testApi);
+    </script>
+</body>
+
+</html>
