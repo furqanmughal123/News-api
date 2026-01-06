@@ -251,13 +251,18 @@
         async function testApi() {
             let inputUrl = document.getElementById('apiUrl').value.trim();
 
-            // Smart default: If empty, and we are on the same port as API (likely not if using Live Server), use origin.
-            // Otherwise default to standard FastAPI port 8000
+            // Smart default: 
+            // 1. If we are on production (e.g. vercel.app), use current origin.
+            // 2. If we are on localhost but NOT port 8000 (e.g. Live Server port 5500), default to 8000.
             if (!inputUrl) {
-                if (window.location.port === '8000') {
-                    inputUrl = window.location.origin;
-                } else {
+                const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+
+                if (isLocal && window.location.port !== '8000') {
+                    // Assume running locally via Live Server or opening file directly
                     inputUrl = 'http://127.0.0.1:8000';
+                } else {
+                    // Production or running on same port as API
+                    inputUrl = window.location.origin;
                 }
             }
 
